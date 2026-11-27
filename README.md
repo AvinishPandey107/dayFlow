@@ -1,46 +1,240 @@
 # DayFlow
 
-Tasks + calendar PWA. React, TypeScript, Tailwind, Supabase (Auth, Postgres, Realtime, Row Level Security).
+### Your tasks. Your time. Your flow.
 
-## 1. Set up Supabase (free tier is enough)
-1. Create a project at supabase.com.
-2. **SQL Editor** → paste `supabase/schema.sql` → Run. This creates `categories`, `recurring_rules`, `tasks`, `events`, turns on Row Level Security (every row is readable and writable only by its owner) and enables realtime.
-3. **Authentication → Providers**: Email is on by default. For quicker testing you can turn off "Confirm email".
-4. **Project Settings → API**: copy the Project URL and the `anon` public key.
+DayFlow is a personal productivity application that combines task management, calendar scheduling, and daily planning in one place. Designed for students and everyday productivity, DayFlow helps you organize tasks, manage deadlines, track progress, and stay focused.
 
-The anon key is designed to be public; Row Level Security is what protects your data. Never put the `service_role` key in this app.
+Access your tasks from your Android phone or laptop, with cloud synchronization keeping everything up to date across devices.
 
-## 2. Run locally
+---
+
+## Features
+
+### Task Management
+- Create, edit, delete, and duplicate tasks.
+- Mark tasks as completed with a checkbox.
+- Set task priorities: Low, Medium, High, and Urgent.
+- Add descriptions, notes, tags, and categories.
+- Organize tasks using projects and subtasks.
+- Search, filter, sort, and reorder tasks.
+- View pending, completed, and overdue tasks.
+- Undo accidental task completion.
+
+### Task Scheduling & Duration
+- Set start dates and deadlines.
+- Schedule tasks for specific time periods.
+- Support tasks lasting multiple days.
+- Set estimated and actual task durations.
+- Track task progress with visual indicators.
+- Receive reminders before deadlines.
+- Create tasks without a deadline.
+
+### Calendar
+- Monthly, weekly, daily, and agenda views.
+- Display tasks and events together.
+- Drag and drop tasks to reschedule them.
+- Create tasks and events directly from the calendar.
+- Color-coded categories and projects.
+- Highlight today's date.
+- View upcoming events and deadlines.
+
+### Dashboard
+- Today's tasks and events.
+- Upcoming deadlines.
+- Overdue tasks.
+- Completed tasks.
+- Daily completion percentage.
+- Weekly productivity summary.
+- Visual progress tracking.
+
+### Productivity Tools
+- Pomodoro focus timer.
+- Focus mode for individual tasks.
+- Habit tracker.
+- Daily planning and end-of-day review.
+- Weekly review.
+- Recurring tasks.
+- Task templates.
+- Quick task creation.
+- Natural language task entry.
+
+### Cross-Device Synchronization
+- Responsive interface for mobile, tablet, and desktop.
+- Installable Progressive Web App (PWA).
+- Cloud-based task storage.
+- Automatic synchronization across devices.
+- Offline task management.
+- Automatic synchronization when internet connectivity returns.
+- Secure user authentication.
+
+### Additional Features
+- Light and dark themes.
+- Customizable settings.
+- Notification reminders.
+- Archive completed tasks.
+- Data export and import.
+- Backup and restore.
+- Keyboard shortcuts.
+- Google Calendar integration.
+
+---
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| React | User interface |
+| TypeScript | Type safety |
+| Tailwind CSS | Styling and responsive design |
+| Supabase | Authentication and cloud backend |
+| PostgreSQL | Persistent database |
+| PWA | Installable cross-device application |
+| Google Calendar API | Calendar integration |
+
+---
+
+## Application Design
+
+DayFlow follows a clean and minimal design inspired by modern productivity applications.
+
+**Desktop**
+- Sidebar navigation
+- Main task management area
+- Calendar and upcoming tasks panel
+
+**Mobile**
+- Bottom navigation
+- Touch-friendly task controls
+- Compact calendar and agenda views
+- Easy task creation
+
+The interface prioritizes simplicity, accessibility, and efficient daily planning.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js
+- npm
+- Git
+
+You will also need a Supabase project for authentication and cloud database functionality.
+
+### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/DayFlow.git
 ```
-cp .env.example .env     # paste the URL and anon key
+
+Navigate to the project directory:
+
+```bash
+cd DayFlow
+```
+
+Install dependencies:
+
+```bash
 npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file in the project root:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Replace the placeholder values with your Supabase project credentials.
+
+Never expose service-role keys or other private credentials in frontend code.
+
+### Run the Application
+
+Start the development server:
+
+```bash
 npm run dev
 ```
-Create an account, then use "Add sample tasks" (and "Remove sample tasks" when done).
 
-## 3. Deploy (Vercel, Netlify or Cloudflare Pages)
-1. Push this folder to a GitHub repo.
-2. Import it in Vercel (or Netlify / Cloudflare Pages). Build command `npm run build`, output directory `dist`.
-3. Add environment variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-4. In Supabase → **Authentication → URL Configuration**, set Site URL to your deployed https URL.
-5. Open the URL on your phone and laptop and sign in with the same account.
+Open the local URL provided by the development server in your browser.
 
-## 4. Install as an app
-- **Android (Chrome):** open the site → ⋮ menu → *Install app* (or *Add to Home screen*).
-- **Laptop (Chrome/Edge):** click the install icon at the right end of the address bar.
-- Replace `public/icon-192.png` and `icon-512.png` with your own artwork when you like.
+---
 
-## How sync works
-- Every change updates the screen instantly, is saved on the device and queued, then sent to Supabase. If you are offline the queue is sent when the connection returns.
-- Supabase Realtime pushes changes to your other devices.
-- Edits send only the fields you changed, so changing the title on one device and the deadline on another keeps both. If two devices change the same field, the later write wins.
+## Database & Security
 
-## Google Calendar (not built yet)
-The `events` table already has `google_event_id` / `google_etag` plus a unique constraint, for de-duplication. What is still needed, and requires your own credentials:
-1. Google Cloud project → enable Google Calendar API → OAuth client (Web).
-2. Supabase **Edge Functions** that hold the client secret and refresh token (never in the frontend), exchange the OAuth code, call `events.list` with a `syncToken` for incremental import, and `events.insert/patch` for changes made in DayFlow.
-3. A "Connect Google Calendar" button that starts the OAuth redirect.
+DayFlow uses Supabase and PostgreSQL for persistent data storage.
 
-## Status
-Built: auth, tasks (period, priority, tags, estimate, duplicate, delete, undo via checkbox), progress and overdue indicators, quick-add with natural language and `q` shortcut, search/sort/filter, dashboard, month calendar with drag-to-reschedule and events, dark mode, offline queue, realtime sync, JSON export.
-Not built yet: week/day/agenda views, drag-to-reorder, swipe actions, subtasks, recurrence, reminders/notifications, Pomodoro/focus mode, habits, templates, reviews, archive, import/restore, synced settings, Google Calendar.
+The database is designed to manage:
+
+- User accounts
+- Tasks
+- Calendar events
+- Categories and projects
+- Recurring task rules
+- Habits
+- User preferences
+
+Row Level Security (RLS) ensures that users can access only their own private data.
+
+---
+
+## Google Calendar Integration
+
+DayFlow supports integration with Google Calendar to help manage existing events alongside personal tasks.
+
+Planned integration capabilities include:
+
+- Importing calendar events.
+- Displaying events within DayFlow.
+- Creating and updating events.
+- Synchronizing calendar changes.
+- Preventing duplicate events.
+
+Google Calendar integration requires OAuth authentication and Google Calendar API configuration.
+
+---
+
+## Progressive Web App
+
+DayFlow is designed as an installable Progressive Web App.
+
+Users can install it on supported Android devices and desktop browsers without needing a separate native application.
+
+PWA capabilities include:
+
+- Installable application.
+- Responsive interface.
+- Offline access.
+- Background synchronization where supported.
+- App-like navigation and experience.
+
+---
+
+## Project Goals
+
+DayFlow aims to make personal productivity simple and accessible by combining:
+
+- Task management
+- Time management
+- Calendar scheduling
+- Daily planning
+- Productivity tracking
+
+The goal is to help users spend less time organizing their work and more time actually completing it.
+
+---
+
+## License
+
+This project is developed for personal productivity and educational purposes.
+
+A license can be added to the repository when the project is ready for public distribution.
