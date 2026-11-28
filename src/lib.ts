@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)
 export const DAY = 864e5
-export type Task = { id: string; title: string; notes: string; done: boolean; completed_at: string | null; start_at: string | null; due_at: string | null; all_day: boolean; priority: number; est_minutes: number | null; tags: string[]; position: number; updated_at: string }
+export type Task = { id: string; title: string; notes: string; done: boolean; completed_at: string | null; start_at: string | null; due_at: string | null; all_day: boolean; priority: number; est_minutes: number | null; spent_minutes?: number; remind_minutes?: number | null; recur?: string | null; recur_every?: number; checklist?: { t: string; d: boolean }[]; day_done?: Record<string, boolean>; archived?: boolean; tags: string[]; position: number; updated_at: string }
 export type Ev = { id: string; title: string; start_at: string; end_at: string; all_day: boolean }
 type T = 'tasks' | 'events'
 type Op = { t: T; k: 'ins' | 'upd' | 'del'; id: string; d?: Record<string, unknown> }
@@ -78,3 +78,5 @@ export function parseQuick(s: string) {
   }
   return { title: title.replace(/\s+/g, ' ').trim() || s, due, priority }
 }
+
+export const bump = (s: string, r: string, n: number) => { const d = new Date(s); if (r === 'daily') d.setDate(d.getDate() + n); else if (r === 'weekly') d.setDate(d.getDate() + 7 * n); else d.setMonth(d.getMonth() + n); return d.toISOString() }
